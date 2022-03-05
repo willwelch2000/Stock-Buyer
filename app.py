@@ -3,14 +3,16 @@ import requests
 from webull import paper_webull
 import time
 import math
-api_key = "K9O9S2HNUYXW3UCE"
+personal_data_file = open("Personal_data.txt")
+personal_data = personal_data_file.readlines()
+api_key = personal_data[0][0:-1]
 length_screen = 25
 
 #Webull login
 wb = paper_webull()
-webull_email = 'willwelch2000@gmail.com'
-webull_pass = 'Amyw4444'
-wb.login(webull_email, webull_pass, 'stockBuyer1', '965483', '2021', 'Abilene')
+webull_email = personal_data[1][0:-1]
+webull_pass = personal_data[2][0:-1]
+wb.login(webull_email, webull_pass, 'stockBuyer1', personal_data[3][0:-1], personal_data[4][0:-1], personal_data[5][0:-1])
 
 #How we did today
 print(wb.get_portfolio())
