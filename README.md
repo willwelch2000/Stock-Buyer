@@ -6,6 +6,7 @@ Download all files
 Make sure that the following packages are installed from pip:  
 - webull
 - requests  
+
 Create the following three text files in the same directory as the project
 - "To_buy.txt": leave empty
 - "Bought.txt": leave empty
