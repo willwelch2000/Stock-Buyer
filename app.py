@@ -3,14 +3,14 @@ import requests
 from webull import paper_webull
 import time
 import math
-api_key = "K9O9S2HNUYXW3UCE"
+api_key = "enter_API_key_here"
 length_screen = 25
 
 #Webull login
 wb = paper_webull()
-webull_email = 'willwelch2000@gmail.com'
-webull_pass = 'Amyw4444'
-wb.login(webull_email, webull_pass, 'stockBuyer1', '965483', '2021', 'Abilene')
+webull_email = 'webull_email'
+webull_pass = 'webull_password'
+wb.login(webull_email, webull_pass, 'device_name', 'login_code', 'question_number', 'question_answer')
 
 #How we did today
 print(wb.get_portfolio())
@@ -160,6 +160,3 @@ for stock in bought:
         print("Sold: " + stock)
 bought_file.close()
 print("Done selling stocks")
-
-
-
