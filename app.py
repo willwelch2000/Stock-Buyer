@@ -8,9 +8,9 @@ length_screen = 25
 
 #Webull login
 wb = paper_webull()
-webull_email = 'enter_username_here'
+webull_email = 'enter_email_here'
 webull_pass = 'enter_password_here'
-wb.login(webull_email, webull_pass, 'device_name', 'login_code', 'question_number', 'answer')
+wb.login(webull_email, webull_pass, 'device_name', 'login_code', 'question_number', 'question_answer')
 
 #How we did today
 print(wb.get_portfolio())
@@ -160,6 +160,3 @@ for stock in bought:
         print("Sold: " + stock)
 bought_file.close()
 print("Done selling stocks")
-
-
-
