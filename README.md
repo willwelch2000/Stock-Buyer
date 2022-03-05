@@ -14,6 +14,6 @@ Create the following three text files in the same directory as the project
 -- Put (in order, one per line) api key, webull email, webull password, login code, multi-factor authentication question number, question answer
 
 ## Usage
-Run app.py
+Run app.py  
 The program will use the text files created to access and store data.
 It will use the paper-trading capability of webull for trading.
