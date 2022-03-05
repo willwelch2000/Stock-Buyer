@@ -1,5 +1,0 @@
-ARGO
-EPC
-PYPL
-FB
-NEWR
