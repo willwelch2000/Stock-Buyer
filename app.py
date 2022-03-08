@@ -14,7 +14,7 @@ webull_email = personal_data[1][0:-1]
 webull_pass = personal_data[2][0:-1]
 wb.login(webull_email, webull_pass, 'stockBuyer1', personal_data[3][0:-1], personal_data[4][0:-1], personal_data[5])
 
-#How we did today
+#Summary of the day
 print(wb.get_portfolio())
 
 #Functions
