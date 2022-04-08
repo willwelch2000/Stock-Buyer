@@ -6,7 +6,7 @@ import math
 personal_data_file = open("Personal_data.txt")
 personal_data = personal_data_file.readlines()
 api_key = personal_data[0][0:-1]
-length_screen = 25
+length_screen = 35
 
 #Webull login
 wb = paper_webull()
