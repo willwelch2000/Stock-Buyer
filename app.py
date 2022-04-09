@@ -5,6 +5,7 @@ import time
 import math
 personal_data_file = open("Personal_data.txt")
 personal_data = personal_data_file.readlines()
+personal_data_file.close();
 api_key = personal_data[0][0:-1]
 length_screen = 35
 
@@ -12,7 +13,7 @@ length_screen = 35
 wb = paper_webull()
 webull_email = personal_data[1][0:-1]
 webull_pass = personal_data[2][0:-1]
-wb.login(webull_email, webull_pass, 'stockBuyer1', personal_data[3][0:-1], personal_data[4][0:-1], personal_data[5])
+wb.login(webull_email, webull_pass, 'stockBuyer1', personal_data[3][0:-1], personal_data[4][0:-1], personal_data[5:-1])
 
 #Summary of the day
 print(wb.get_portfolio())
@@ -47,8 +48,14 @@ def removefromFile(symbol, file_name):
 def stockList():
     #Generates list of stocks to consider
     stocks_watchlist = []
-    watchlist = wb.get_watchlists()[4]['tickerList']
-    for stock_data in watchlist:
+    watchlists = wb.get_watchlists()
+    list_name = personal_data[6]
+    true_watchlist = []
+    for watchlist in watchlists:
+        if (watchlist['name'] == list_name):
+            true_watchlist = watchlist['tickerList']
+            break
+    for stock_data in true_watchlist:
         stocks_watchlist.append(stock_data['symbol'])
     if len(stocks_watchlist) > 0:
         return stocks_watchlist
