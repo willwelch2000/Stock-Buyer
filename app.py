@@ -5,7 +5,7 @@ import time
 import math
 personal_data_file = open("Personal_data.txt")
 personal_data = personal_data_file.readlines()
-personal_data_file.close();
+personal_data_file.close()
 api_key = personal_data[0][0:-1]
 length_screen = 35
 
