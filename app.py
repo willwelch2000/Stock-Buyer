@@ -32,7 +32,7 @@ def getFunction(symbol, time_period, function):
             lastRefreshedDate = data['Meta Data']['3: Last Refreshed']
             if len(data[f'Technical Analysis: {function}']) == 0:
                 return -1
-            return data[f'Technical Analysis: {function}'][lastRefreshedDate][function]
+            return float(data[f'Technical Analysis: {function}'][lastRefreshedDate][function])
         except KeyError:
             #Must wait a minute; wait and then recall
             print("Waiting 1 minute")
@@ -88,18 +88,18 @@ def stockList():
             stocks_list.append(symbol_list[i])
         return stocks_list
 def shouldAddToBuy(symbol):
-    RSI = float(getFunction(symbol, 10, 'RSI'))
+    RSI = getFunction(symbol, 10, 'RSI')
     if 0 < RSI < 30:
         return True
     return False
 def shouldBuy(symbol):
     price = getPrice(symbol)
-    sma = float(getFunction(symbol, 10, 'SMA'))
+    sma = getFunction(symbol, 10, 'SMA')
     if (price > sma > 0):
         return True
     return False
 def shouldRemoveToBuy(symbol):
-    RSI = float(getFunction(symbol, 10, 'RSI'))
+    RSI = getFunction(symbol, 10, 'RSI')
     if RSI > 40:
         return True
     return False
@@ -110,14 +110,13 @@ def shouldSell(symbol):
         return True
     return False
 def buy(symbol) :
-    buy_price = float(getPrice(symbol)) + 500
+    buy_price = getPrice(symbol) + 500
     wb.place_order(stock=symbol, price=buy_price, quant=20)
 def sell(symbol) :
-    sell_price = math.floor(float(getPrice(symbol)) * .98)
+    sell_price = math.floor(getPrice(symbol) * .98)
     wb.place_order(stock=symbol, price=sell_price, quant=20, action="SELL")
 
-
-#Choose stocks to add to To_buy.txt
+#Choose stocks to add to "To buy" list
 to_buy_file = open("To_buy.txt", "r+")
 to_buy = to_buy_file.readlines()
 just_added = []
@@ -132,9 +131,9 @@ for stock in stock_list:
         just_added.append(stock)
         print("To_buy added: " + stock)
 to_buy_file.close()
-print("Done adding stocks to To_buy")
+print("Done adding stocks to \"To buy\"")
 
-#Delete items from To_buy.txt that should go
+#Delete items from "To buy" that should go
 to_buy_file = open('To_buy.txt', "r")
 to_buy = to_buy_file.readlines()
 for stock in to_buy:
@@ -145,9 +144,9 @@ for stock in to_buy:
         removefromFile(stock, "To_buy.txt")
         print("To_buy removed: " + stock)
 to_buy_file.close()
-print("Done removing stocks from To_buy")
+print("Done removing stocks from \"To buy\"")
 
-#Buy items from To_buy.txt that meet criteria. Add to Bought.txt. Remove from To_buy.txt
+#Buy items from "To buy" that meet criteria. Add to "Bought". Remove from "To buy"
 to_buy_file = open('To_buy.txt', "r")
 to_buy = to_buy_file.readlines()
 bought_file = open("Bought.txt", "r+")
@@ -165,7 +164,7 @@ to_buy_file.close()
 bought_file.close()
 print("Done buying stocks")
 
-#Sell items from Bought.txt that meet criteria. Remove from Bought.txt
+#Sell items from "Bought" that meet criteria. Remove from "Bought"
 bought_file = open("Bought.txt", "r+")
 bought = bought_file.readlines()
 for stock in bought:
