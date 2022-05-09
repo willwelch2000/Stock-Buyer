@@ -7,13 +7,16 @@ personal_data_file = open("Personal_data.txt")
 personal_data = personal_data_file.readlines()
 personal_data_file.close()
 api_key = personal_data[0][0:-1]
-length_screen = 35
+length_screen = 55
 
 #Webull login
 wb = paper_webull()
 webull_email = personal_data[1][0:-1]
 webull_pass = personal_data[2][0:-1]
-wb.login(webull_email, webull_pass, 'stockBuyer1', personal_data[3][0:-1], personal_data[4][0:-1], personal_data[5:-1])
+mfa_pass = personal_data[3][0:-1]
+security_question_id = personal_data[4][0:-1]
+security_question_ans = personal_data[5:-1]
+wb.login(webull_email, webull_pass, 'stockBuyer1', mfa_pass, security_question_id, security_question_ans)
 
 #Summary of the day
 print(wb.get_portfolio())
