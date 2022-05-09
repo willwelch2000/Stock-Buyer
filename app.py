@@ -7,7 +7,7 @@ personal_data_file = open("Personal_data.txt")
 personal_data = personal_data_file.readlines()
 personal_data_file.close()
 api_key = personal_data[0][0:-1]
-length_screen = 35
+length_screen = 25
 
 #Webull login
 wb = paper_webull()
@@ -49,7 +49,7 @@ def stockList():
     #Generates list of stocks to consider
     stocks_watchlist = []
     watchlists = wb.get_watchlists()
-    list_name = personal_data[6]
+    list_name = personal_data[6:-1]
     true_watchlist = []
     for watchlist in watchlists:
         if (watchlist['name'] == list_name):
