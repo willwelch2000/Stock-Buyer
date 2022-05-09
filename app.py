@@ -38,6 +38,10 @@ def getFunction(symbol, time_period, function):
             print("Waiting 1 minute")
             time.sleep(60)
             data = requests.get(url).json()
+def getPrice(symbol):
+    #Accesses webull stock data to find price
+    price = float(wb.get_quote(symbol)['close'])
+    return price
 def removefromFile(symbol, file_name):
     #Removes symbol from file
     old_file = open(file_name, "r")
@@ -52,7 +56,7 @@ def stockList():
     #Generates list of stocks to consider
     stocks_watchlist = []
     watchlists = wb.get_watchlists()
-    list_name = personal_data[6:-1]
+    list_name = "Consider"
     true_watchlist = []
     for watchlist in watchlists:
         if (watchlist['name'] == list_name):
@@ -89,7 +93,7 @@ def shouldAddToBuy(symbol):
         return True
     return False
 def shouldBuy(symbol):
-    price = float(wb.get_quote(symbol)['close'])
+    price = getPrice(symbol)
     sma = float(getFunction(symbol, 10, 'SMA'))
     if (price > sma > 0):
         return True
@@ -100,16 +104,16 @@ def shouldRemoveToBuy(symbol):
         return True
     return False
 def shouldSell(symbol):
-    price = wb.get_quote(symbol)['close']
+    price = getPrice(symbol)
     sma = getFunction(symbol, 10, 'SMA')
     if price < sma:
         return True
     return False
 def buy(symbol) :
-    buy_price = float(wb.get_quote(symbol)['close']) + 500
+    buy_price = float(getPrice(symbol)) + 500
     wb.place_order(stock=symbol, price=buy_price, quant=20)
 def sell(symbol) :
-    sell_price = math.floor(float(wb.get_quote(symbol)['close']) * .98)
+    sell_price = math.floor(float(getPrice(symbol)) * .98)
     wb.place_order(stock=symbol, price=sell_price, quant=20, action="SELL")
 
 
