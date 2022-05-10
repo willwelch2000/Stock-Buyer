@@ -4,25 +4,6 @@ from webull import paper_webull
 import time
 import math
 
-#Organize personal data
-personal_data_file = open("Personal_data.txt")
-personal_data = personal_data_file.readlines()
-personal_data_file.close()
-api_key = personal_data[0][0:-1]
-webull_email = personal_data[1][0:-1]
-webull_pass = personal_data[2][0:-1]
-mfa_pass = personal_data[3][0:-1]
-security_question_id = personal_data[4][0:-1]
-security_question_ans = personal_data[5:-1]
-length_screen = 30
-
-#Webull login-- 'stockBuyer1' is the name that shows up on Webull
-wb = paper_webull()
-wb.login(webull_email, webull_pass, 'stockBuyer1', mfa_pass, security_question_id, security_question_ans)
-
-#Summary of the day
-print(wb.get_portfolio())
-
 #Functions
 def getFunction(symbol, time_period, function):
     #Uses API to find a function of a specific --returns -1 if not found in API
@@ -56,19 +37,14 @@ def removefromFile(symbol, file_name):
     new_file.close()
 def considerList():
     #Generates list of stocks to consider
-    stocks_watchlist = []
-    watchlists = wb.get_watchlists()
+
+    #Checks if the watchlist "Consider" on webull profile is nonempty--if so, it returns this
     list_name = "Consider"
-    true_watchlist = []
-    for watchlist in watchlists:
-        if (watchlist['name'] == list_name):
-            true_watchlist = watchlist['tickerList']
-            break
-    for stock_data in true_watchlist:
-        stocks_watchlist.append(stock_data['symbol'])
+    stocks_watchlist = getWatchlist(list_name)
     if len(stocks_watchlist) > 0:
         return stocks_watchlist
-    #Uses screener, shrinks list
+
+    #Otherwise--uses a screening tool
     id_list = wb.run_screener(pct_chg_lte=-.7, pct_chg_gte=-.04, price_lte=15, price_gte=2000, region='United States')['tickerIdList']
     symbol_list = []
     for id in id_list:
@@ -80,7 +56,7 @@ def considerList():
                 symbol_list.append(symbol)
         except JSONDecodeError:
             continue
-    #Shrink list to 10
+    #Shrink list to maximum size
     if (length_screen > len(symbol_list)):
         return symbol_list
     else:
@@ -89,9 +65,20 @@ def considerList():
         for i in range(0, increment*length_screen, increment):
             stocks_list.append(symbol_list[i])
         return stocks_list
+def getWatchlist(name):
+    watchlists = wb.get_watchlists()
+    correct_list = []
+    for watchlist in watchlists:
+        if (watchlist['name'] == name):
+            correct_list = watchlist['tickerList']
+            break
+    stock_list = []
+    for stock_data in correct_list:
+        stock_list.append(stock_data['symbol'])
+    return stock_list
 def shouldAddToBuy(symbol):
-    RSI = getFunction(symbol, 10, 'RSI')
-    if 0 < RSI < 30:
+    rsi = getFunction(symbol, 10, 'RSI')
+    if 0 < rsi < 30:
         return True
     return False
 def shouldBuy(symbol):
@@ -101,8 +88,8 @@ def shouldBuy(symbol):
         return True
     return False
 def shouldRemoveToBuy(symbol):
-    RSI = getFunction(symbol, 10, 'RSI')
-    if RSI > 40:
+    rsi = getFunction(symbol, 10, 'RSI')
+    if rsi > 40:
         return True
     return False
 def shouldSell(symbol):
@@ -117,6 +104,25 @@ def buy(symbol) :
 def sell(symbol) :
     sell_price = math.floor(getPrice(symbol) * .98)
     wb.place_order(stock=symbol, price=sell_price, quant=20, action="SELL")
+
+#Organize personal data
+personal_data_file = open("Personal_data.txt")
+personal_data = personal_data_file.readlines()
+personal_data_file.close()
+api_key = personal_data[0][0:-1]
+webull_email = personal_data[1][0:-1]
+webull_pass = personal_data[2][0:-1]
+mfa_pass = personal_data[3][0:-1]
+security_question_id = personal_data[4][0:-1]
+security_question_ans = personal_data[5:-1]
+length_screen = 30
+
+#Webull login-- 'stockBuyer1' is the name that shows up on Webull
+wb = paper_webull()
+wb.login(webull_email, webull_pass, 'stockBuyer1', mfa_pass, security_question_id, security_question_ans)
+
+#Summary of the day
+print(wb.get_portfolio())
 
 #Choose stocks to add to "To buy" list
 to_buy_file = open("To_buy.txt", "r+")
