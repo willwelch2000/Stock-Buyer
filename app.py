@@ -3,19 +3,21 @@ import requests
 from webull import paper_webull
 import time
 import math
+
+#Organize personal data
 personal_data_file = open("Personal_data.txt")
 personal_data = personal_data_file.readlines()
 personal_data_file.close()
 api_key = personal_data[0][0:-1]
-length_screen = 55
-
-#Webull login
-wb = paper_webull()
 webull_email = personal_data[1][0:-1]
 webull_pass = personal_data[2][0:-1]
 mfa_pass = personal_data[3][0:-1]
 security_question_id = personal_data[4][0:-1]
 security_question_ans = personal_data[5:-1]
+length_screen = 55
+
+#Webull login-- 'stockBuyer1' is the name that shows up on Webull
+wb = paper_webull()
 wb.login(webull_email, webull_pass, 'stockBuyer1', mfa_pass, security_question_id, security_question_ans)
 
 #Summary of the day
@@ -52,7 +54,7 @@ def removefromFile(symbol, file_name):
         if line != symbol + "\n":
             new_file.write(line)
     new_file.close()
-def stockList():
+def considerList():
     #Generates list of stocks to consider
     stocks_watchlist = []
     watchlists = wb.get_watchlists()
@@ -120,10 +122,10 @@ def sell(symbol) :
 to_buy_file = open("To_buy.txt", "r+")
 to_buy = to_buy_file.readlines()
 just_added = []
-stock_list = stockList()
-print("Stock list located")
-print(stock_list)
-for stock in stock_list:
+consider_list = considerList()
+print("Consider list located")
+print(consider_list)
+for stock in consider_list:
     if (stock + "\n") in to_buy:
         continue
     if shouldAddToBuy(stock):
@@ -137,7 +139,7 @@ print("Done adding stocks to \"To buy\"")
 to_buy_file = open('To_buy.txt', "r")
 to_buy = to_buy_file.readlines()
 for stock in to_buy:
-    stock = stock[:-1]
+    stock = stock[:-1] #Trim off carriage return
     if stock in just_added:
         continue
     if shouldRemoveToBuy(stock):
@@ -154,7 +156,7 @@ bought = bought_file.readlines()
 for stock in to_buy:
     if stock in bought:
         continue
-    stock = stock[:-1]
+    stock = stock[:-1] #Trim off carriage return
     if shouldBuy(stock):
         buy(stock)
         bought_file.write(stock + "\n")
@@ -168,7 +170,7 @@ print("Done buying stocks")
 bought_file = open("Bought.txt", "r+")
 bought = bought_file.readlines()
 for stock in bought:
-    stock = stock[:-1]
+    stock = stock[:-1] #Trim off carriage return
     if shouldSell(stock):
         sell(stock)
         removefromFile(stock, "Bought.txt")
