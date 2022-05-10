@@ -14,7 +14,7 @@ webull_pass = personal_data[2][0:-1]
 mfa_pass = personal_data[3][0:-1]
 security_question_id = personal_data[4][0:-1]
 security_question_ans = personal_data[5:-1]
-length_screen = 55
+length_screen = 30
 
 #Webull login-- 'stockBuyer1' is the name that shows up on Webull
 wb = paper_webull()
