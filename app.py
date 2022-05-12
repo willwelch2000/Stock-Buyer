@@ -4,6 +4,9 @@ from webull import paper_webull
 import time
 import math
 
+#Parameters
+length_screen = 30
+
 #Functions
 def getFunction(symbol, time_period, function):
     #Uses API to find a function of a specific --returns -1 if not found in API
@@ -115,7 +118,6 @@ webull_pass = personal_data[2][0:-1]
 mfa_pass = personal_data[3][0:-1]
 security_question_id = personal_data[4][0:-1]
 security_question_ans = personal_data[5:-1]
-length_screen = 30
 
 #Webull login-- 'stockBuyer1' is the name that shows up on Webull
 wb = paper_webull()
