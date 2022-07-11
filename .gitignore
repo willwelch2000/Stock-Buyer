@@ -1,2 +1,4 @@
-# ignore text files
+# ignore text files and personal data
 *.txt
+
+personalData.json

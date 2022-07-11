@@ -1,11 +1,12 @@
 from json import JSONDecodeError
+import json
 import requests
 from webull import paper_webull
 import time
 import math
 
 #Parameters
-length_screen = 30
+length_screen = 25
 
 #Functions
 def getFunction(symbol, time_period, function):
@@ -28,17 +29,18 @@ def getPrice(symbol):
     #Accesses webull stock data to find price
     price = float(wb.get_quote(symbol)['close'])
     return price
-def removefromFile(symbol, file_name):
-    #Removes symbol from file
-    old_file = open(file_name, "r")
-    lines = old_file.readlines()
-    old_file.close()
-    new_file = open(file_name, "w")
-    for line in lines:
-        if line != symbol + "\n":
-            new_file.write(line)
-    new_file.close()
-def considerList():
+def getWatchlist(name):
+    watchlists = wb.get_watchlists()
+    correct_list = []
+    for watchlist in watchlists:
+        if (watchlist['name'] == name):
+            correct_list = watchlist['tickerList']
+            break
+    stock_list = []
+    for stock_data in correct_list:
+        stock_list.append(stock_data['symbol'])
+    return stock_list
+def getConsiderList():
     #Generates list of stocks to consider
 
     #Checks if the watchlist "Consider" on webull profile is nonempty--if so, it returns this
@@ -68,31 +70,36 @@ def considerList():
         for i in range(0, increment*length_screen, increment):
             stocks_list.append(symbol_list[i])
         return stocks_list
-def getWatchlist(name):
-    watchlists = wb.get_watchlists()
-    correct_list = []
-    for watchlist in watchlists:
-        if (watchlist['name'] == name):
-            correct_list = watchlist['tickerList']
-            break
+def getBoughtList():
+    positions = wb.get_positions()
     stock_list = []
-    for stock_data in correct_list:
-        stock_list.append(stock_data['symbol'])
+    for position in positions:
+        stock_list.append(position['ticker']['symbol'])
     return stock_list
+def removefromFile(symbol, file_name):
+    #Removes symbol from file
+    old_file = open(file_name, "r")
+    lines = old_file.readlines()
+    old_file.close()
+    new_file = open(file_name, "w")
+    for line in lines:
+        if line != symbol + "\n":
+            new_file.write(line)
+    new_file.close()
 def shouldAddToBuy(symbol):
     rsi = getFunction(symbol, 10, 'RSI')
     if 0 < rsi < 30:
+        return True
+    return False
+def shouldRemoveToBuy(symbol):
+    rsi = getFunction(symbol, 10, 'RSI')
+    if rsi > 40:
         return True
     return False
 def shouldBuy(symbol):
     price = getPrice(symbol)
     sma = getFunction(symbol, 10, 'SMA')
     if (price > sma > 0):
-        return True
-    return False
-def shouldRemoveToBuy(symbol):
-    rsi = getFunction(symbol, 10, 'RSI')
-    if rsi > 40:
         return True
     return False
 def shouldSell(symbol):
@@ -102,35 +109,33 @@ def shouldSell(symbol):
         return True
     return False
 def buy(symbol) :
-    buy_price = getPrice(symbol) + 500
+    buy_price = getPrice(symbol)
     wb.place_order(stock=symbol, price=buy_price, quant=20)
 def sell(symbol) :
     sell_price = math.floor(getPrice(symbol) * .98)
     wb.place_order(stock=symbol, price=sell_price, quant=20, action="SELL")
 
 #Organize personal data
-personal_data_file = open("Personal_data.txt")
-personal_data = personal_data_file.readlines()
-personal_data_file.close()
-api_key = personal_data[0][0:-1]
-webull_email = personal_data[1][0:-1]
-webull_pass = personal_data[2][0:-1]
-mfa_pass = personal_data[3][0:-1]
-security_question_id = personal_data[4][0:-1]
-security_question_ans = personal_data[5:-1]
+personal_data_file = open("personalData.json")
+personal_data = json.load(personal_data_file)
+api_key = personal_data['apiKey']
+email = personal_data['email']
+password = personal_data['password']
+mfa_pass = personal_data['mfaPass']
+security_question_id = personal_data['securityQuestionId']
+security_ans = personal_data['securityAnswer']
 
 #Webull login-- 'stockBuyer1' is the name that shows up on Webull
 wb = paper_webull()
-wb.login(webull_email, webull_pass, 'stockBuyer1', mfa_pass, security_question_id, security_question_ans)
+wb.login(email, password, 'stockBuyer1', mfa_pass, security_question_id, security_ans)
 
 #Summary of the day
 print(wb.get_portfolio())
-
-#Choose stocks to add to "To buy" list
+#Choose stocks to add to "To buy"
 to_buy_file = open("To_buy.txt", "r+")
 to_buy = to_buy_file.readlines()
 just_added = []
-consider_list = considerList()
+consider_list = getConsiderList()
 print("Consider list located")
 print(consider_list)
 for stock in consider_list:
@@ -156,34 +161,27 @@ for stock in to_buy:
 to_buy_file.close()
 print("Done removing stocks from \"To buy\"")
 
-#Buy items from "To buy" that meet criteria. Add to "Bought". Remove from "To buy"
+#Buy items from "To buy" that meet criteria. Remove from "To buy"
 to_buy_file = open('To_buy.txt', "r")
 to_buy = to_buy_file.readlines()
-bought_file = open("Bought.txt", "r+")
-bought = bought_file.readlines()
+bought = getBoughtList()
 for stock in to_buy:
+    stock = stock[:-1] #Trim off carriage return
     if stock in bought:
         continue
-    stock = stock[:-1] #Trim off carriage return
     if shouldBuy(stock):
         buy(stock)
-        bought_file.write(stock + "\n")
         removefromFile(stock, "To_buy.txt")
         print("Bought: " + stock)
 to_buy_file.close()
-bought_file.close()
 print("Done buying stocks")
 
-#Sell items from "Bought" that meet criteria. Remove from "Bought"
-bought_file = open("Bought.txt", "r+")
-bought = bought_file.readlines()
+#Sell items from bought list that meet criteria
+bought = getBoughtList()
 for stock in bought:
-    stock = stock[:-1] #Trim off carriage return
     if shouldSell(stock):
         sell(stock)
-        removefromFile(stock, "Bought.txt")
         print("Sold: " + stock)
-bought_file.close()
 print("Done selling stocks")
 
 
