@@ -4,9 +4,10 @@ import requests
 from webull import paper_webull
 import time
 import math
+from managedb import ManageDb
 
 #Parameters
-length_screen = 25
+length_screen = 40
 
 #Functions
 def getFunction(symbol, time_period, function):
@@ -76,6 +77,12 @@ def getBoughtList():
     for position in positions:
         stock_list.append(position['ticker']['symbol'])
     return stock_list
+def getToBuyList():
+    db_manager = ManageDb(r"C:\Users\willw\PycharmProjects\stockBuyer1\db\stockData.db")
+    db_list = db_manager.select_all_to_buy()
+    to_buy_list = list(map(lambda stock_obj: stock_obj[0], db_list))
+    db_manager.close_connection()
+    return to_buy_list
 def removefromFile(symbol, file_name):
     #Removes symbol from file
     old_file = open(file_name, "r")
@@ -96,6 +103,14 @@ def shouldRemoveToBuy(symbol):
     if rsi > 40:
         return True
     return False
+def addToBuy(symbol):
+    db_manager = ManageDb(r"C:\Users\willw\PycharmProjects\stockBuyer1\db\stockData.db")
+    db_manager.insert_to_buy(symbol)
+    db_manager.close_connection()
+def deleteToBuy(symbol):
+    db_manager = ManageDb(r"C:\Users\willw\PycharmProjects\stockBuyer1\db\stockData.db")
+    db_manager.delete_to_buy(symbol)
+    db_manager.close_connection()
 def shouldBuy(symbol):
     price = getPrice(symbol)
     sma = getFunction(symbol, 10, 'SMA')
@@ -131,49 +146,42 @@ wb.login(email, password, 'stockBuyer1', mfa_pass, security_question_id, securit
 
 #Summary of the day
 print(wb.get_portfolio())
+
 #Choose stocks to add to "To buy"
-to_buy_file = open("To_buy.txt", "r+")
-to_buy = to_buy_file.readlines()
+to_buy = getToBuyList()
 just_added = []
 consider_list = getConsiderList()
 print("Consider list located")
 print(consider_list)
 for stock in consider_list:
-    if (stock + "\n") in to_buy:
+    if stock in to_buy:
         continue
     if shouldAddToBuy(stock):
-        to_buy_file.write(stock + "\n")
+        addToBuy(stock)
         just_added.append(stock)
         print("To_buy added: " + stock)
-to_buy_file.close()
 print("Done adding stocks to \"To buy\"")
 
 #Delete items from "To buy" that should go
-to_buy_file = open('To_buy.txt', "r")
-to_buy = to_buy_file.readlines()
+to_buy = getToBuyList()
 for stock in to_buy:
-    stock = stock[:-1] #Trim off carriage return
     if stock in just_added:
         continue
     if shouldRemoveToBuy(stock):
-        removefromFile(stock, "To_buy.txt")
+        deleteToBuy(stock)
         print("To_buy removed: " + stock)
-to_buy_file.close()
 print("Done removing stocks from \"To buy\"")
 
 #Buy items from "To buy" that meet criteria. Remove from "To buy"
-to_buy_file = open('To_buy.txt', "r")
-to_buy = to_buy_file.readlines()
+to_buy = getToBuyList()
 bought = getBoughtList()
 for stock in to_buy:
-    stock = stock[:-1] #Trim off carriage return
     if stock in bought:
         continue
     if shouldBuy(stock):
         buy(stock)
-        removefromFile(stock, "To_buy.txt")
+        deleteToBuy(stock)
         print("Bought: " + stock)
-to_buy_file.close()
 print("Done buying stocks")
 
 #Sell items from bought list that meet criteria

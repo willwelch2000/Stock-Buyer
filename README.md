@@ -8,7 +8,6 @@ Make sure that the following packages are installed from pip:
 - requests  
 
 Create the following three text files in the same directory as the project
-- "To_buy.txt": leave empty
 - "personalData.json"  
 -- Put (in order, one per line) api key, webull email, webull password, login code, multi-factor authentication question number, question answer
 
