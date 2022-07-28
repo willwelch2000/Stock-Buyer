@@ -11,7 +11,7 @@ length_screen = 40
 
 #Functions
 def getFunction(symbol, time_period, function):
-    #Uses API to find a function of a specific --returns -1 if not found in API
+    #Uses API to find a function of a specific stock--returns -1 if not found in API
     interval = 'daily'
     url = f'https://www.alphavantage.co/query?function={function}&symbol={symbol}&interval={interval}&time_period={time_period}&series_type=close&apikey={api_key}'
     data = requests.get(url).json()
