@@ -7,13 +7,8 @@ Make sure that the following packages are installed from pip:
 - webull
 - requests  
 
-Create the following three text files in the same directory as the project
-- "To_buy.txt": leave empty
-- "Bought.txt": leave empty
-- "Personal_data.txt"  
--- Put (in order, one per line) api key, webull email, webull password, login code, multi-factor authentication question number, question answer
+Fill in the personal info for your webull account in the personal_data.json file
 
 ## Usage
 Run app.py  
-The program will use the text files created to access and store data.
-It will use the paper-trading capability of webull for trading.
+The program will use the paper-trading capability of webull for trading.

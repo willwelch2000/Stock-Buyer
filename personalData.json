@@ -1,0 +1,8 @@
+{
+  "apiKey": "{YOUR_API_KEY}",
+  "email": "{YOUR_WEBULL_EMAIL}",
+  "password": "{YOUR_WEBULL_PASSWORD}",
+  "mfaPass": "{YOUR_WEBULL_MFAPASS}",
+  "securityQuestionId": "{YOUR_SECURITY_QUESTION_ID}",
+  "securityAnswer": "{YOUR_SECURITY_QUESTION_ANSWER}"
+}
